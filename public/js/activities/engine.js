@@ -256,18 +256,26 @@ const generators = {
   },
 
  "habitat-animal": () => {
-  const animals = sample(
-    [...ANIMALS_DATA.domestic, ...ANIMALS_DATA.wild, ...ANIMALS_DATA.birds],
-    5,
-  );
+  const habitatLabels = {
+  casa: "🏠 Casa",
+  granja: "🏠 Casa",
+  selva: "🌿 Selva",
+  sabana: "🌾 Sabana",
+  bosque: "🌲 Bosque",
+  mar: "🌊 Mar",
+  río: "🌊 Mar",
+  lago: "🌊 Mar",
+  árbol: "🌲 Bosque",
+  polo: "🌊 Mar",
+};
 
-  return animals.map((a) => ({
-    type: "habitat",
-    question: `¿Dónde vive el ${a.name}?`,
-    emoji: a.emoji,
-    options: ["🏠 Casa", "🌿 Selva", "🌾 Sabana", "🌊 Mar", "🌲 Bosque"],
-    correct: "🏠 Casa",
-  }));
+return animals.map((a) => ({
+  type: "habitat",
+  question: `¿Dónde vive el ${a.name}?`,
+  emoji: a.emoji,
+  options: ["🏠 Casa", "🌿 Selva", "🌾 Sabana", "🌊 Mar", "🌲 Bosque"],
+  correct: habitatLabels[a.habitat],
+}));
 },
 
   // --- SOUNDS (environmental, non-animal) ---

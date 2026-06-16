@@ -27,6 +27,8 @@ export const ActivityRenderer = {
       case 'animal-sound-match':
       case 'identify-sound':
         return this._renderMultipleChoice(question, container);
+        case 'habitat':
+  return this._renderMultipleChoice(question, container);
       case 'touch-body':
         return this._renderTouchBody(question, container);
       case 'complete-body':
