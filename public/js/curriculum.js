@@ -394,3 +394,17 @@ export const GREETINGS_DATA = [
   { eng: "Please!", esp: "¡Por favor!", emoji: "😊" },
   { eng: "Yes / No", esp: "Sí / No", emoji: "✅" }
 ];
+
+// Environmental sounds (non-animal) for the "Sonidos" topic in Pre Jardín
+export const SOUNDS_DATA = [
+  { name: "Campana", emoji: "🔔", sound: "Riiing riiing" },
+  { name: "Teléfono", emoji: "📞", sound: "Rin rin" },
+  { name: "Lluvia", emoji: "🌧️", sound: "Tic tic tic" },
+  { name: "Trueno", emoji: "⛈️", sound: "Bruuum" },
+  { name: "Carro", emoji: "🚗", sound: "Bip bip" },
+  { name: "Tren", emoji: "🚂", sound: "Chuu chuu" },
+  { name: "Reloj", emoji: "⏰", sound: "Tic tac" },
+  { name: "Aplausos", emoji: "👏", sound: "Clap clap" },
+  { name: "Viento", emoji: "💨", sound: "Fiuuu" },
+  { name: "Tambor", emoji: "🥁", sound: "Pum pum" }
+];

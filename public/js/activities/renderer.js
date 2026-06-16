@@ -21,9 +21,16 @@ export const ActivityRenderer = {
       case 'recognize-shape':
       case 'identify-body':
       case 'identify-fruit':
+      case 'fruit-color':
       case 'identify-transport':
       case 'sound-animal':
+      case 'animal-sound-match':
+      case 'identify-sound':
         return this._renderMultipleChoice(question, container);
+      case 'touch-body':
+        return this._renderTouchBody(question, container);
+      case 'complete-body':
+        return this._renderCompleteBody(question, container);
       case 'listen-vocal':
         return this._renderListenSelect(question, container);
       case 'complete-word':
@@ -129,6 +136,43 @@ export const ActivityRenderer = {
       </div>
     `;
     this._attachOptionListeners(container, '.option-btn', String(q.correct));
+  },
+
+  // ===== TOUCH BODY (teacher says it, options show emoji + name) =====
+  _renderTouchBody(q, container) {
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="question-subtitle" style="margin-bottom:0.5rem;opacity:0.8">El profesor lo dice en voz alta, los niños señalan 👇</div>
+        <div class="options-grid cols-2">
+          ${q.options.map(opt => `
+            <button class="option-btn" data-answer="${opt.name}">
+              <span class="opt-emoji">${opt.emoji}</span>
+              <span class="opt-label">${opt.name}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', q.correct);
+  },
+
+  // ===== COMPLETE BODY (figure missing a part) =====
+  _renderCompleteBody(q, container) {
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div style="font-size:6rem;margin:0.5rem 0;opacity:0.85">${q.figureEmoji}</div>
+        <div class="options-grid cols-2" style="margin-top:1rem">
+          ${q.options.map(opt => `
+            <button class="option-btn" data-answer="${opt}">
+              <span class="opt-label">${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', q.correct);
   },
 
   // ===== LISTEN & SELECT =====

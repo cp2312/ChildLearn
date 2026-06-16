@@ -1,7 +1,7 @@
 // public/js/activities/engine.js
 // Generates activity question sets for all types
 
-import { COLORS_DATA, VOWELS_DATA, ANIMALS_DATA, FRUITS_DATA, SHAPES_DATA, BODY_PARTS, TRANSPORT_DATA, GREETINGS_DATA } from '../curriculum.js';
+import { COLORS_DATA, VOWELS_DATA, ANIMALS_DATA, FRUITS_DATA, SHAPES_DATA, BODY_PARTS, TRANSPORT_DATA, GREETINGS_DATA, SOUNDS_DATA } from '../curriculum.js';
 
 // Shuffle array
 function shuffle(arr) {
@@ -156,6 +156,18 @@ const generators = {
     }));
   },
 
+  'animal-sound-match': () => {
+    // Inverse of sound-animal: shown the animal, choose its sound
+    const withSounds = [...ANIMALS_DATA.domestic, ...ANIMALS_DATA.wild].filter(a => a.sound);
+    return sample(withSounds, 5).map(a => ({
+      type: 'animal-sound-match',
+      question: `¿Qué sonido hace el ${a.name}?`,
+      emoji: a.emoji,
+      options: shuffle([a.sound, ...pickWrong(withSounds, a, 3).map(x=>x.sound)]),
+      correct: a.sound
+    }));
+  },
+
   'classify-animal': () => {
     const items = [
       ...ANIMALS_DATA.domestic.slice(0,3).map(a=>({...a,cat:'🏠 Doméstico'})),
@@ -178,6 +190,22 @@ const generators = {
       habitats: ['🏠 Casa','🌿 Selva','🌾 Sabana','🌊 Mar','🌲 Bosque'],
       correct: `🏠 Casa`  // simplified - in real app map habitat properly
     }));
+  },
+
+  // --- SOUNDS (environmental, non-animal) ---
+  'identify-sound': () => {
+    return sample(SOUNDS_DATA, 6).map(s => ({
+      type: 'identify-sound',
+      question: `¿Qué hace ese sonido: "${s.sound}"?`,
+      sound: s.sound,
+      options: shuffle([s.name, ...pickWrong(SOUNDS_DATA, s, 3).map(x=>x.name)]),
+      correct: s.name
+    }));
+  },
+
+  'memory-sound': () => {
+    const pairs = sample(SOUNDS_DATA, 4).map(s => ({ name: s.name, emoji: s.emoji }));
+    return [{ type: 'memory', pairs, gridCols: 4 }];
   },
 
   // --- NUMBERS ---
@@ -404,6 +432,36 @@ const generators = {
     }));
   },
 
+  'touch-body': () => {
+    // Teacher reads "Toca tu nariz" out loud; children point at the screen
+    return sample(BODY_PARTS, 5).map(b => ({
+      type: 'touch-body',
+      question: `Toca tu: ${b.name}`,
+      options: shuffle([b, ...pickWrong(BODY_PARTS, b, 3)]),
+      correct: b.name
+    }));
+  },
+
+  'complete-body': () => {
+    // Shows a body figure missing one part (described in text), choose the missing part
+    const scenarios = BODY_PARTS.map(b => ({
+      missing: b,
+      figureEmoji: '🧍'
+    }));
+    return shuffle(scenarios).slice(0,5).map(s => ({
+      type: 'complete-body',
+      question: '¿Qué parte le falta a la figura?',
+      figureEmoji: s.figureEmoji,
+      options: shuffle([s.missing.name, ...pickWrong(BODY_PARTS, s.missing, 3).map(x=>x.name)]),
+      correct: s.missing.name
+    }));
+  },
+
+  'memory-body': () => {
+    const pairs = sample(BODY_PARTS, 4).map(b => ({ name: b.name, emoji: b.emoji }));
+    return [{ type: 'memory', pairs, gridCols: 4 }];
+  },
+
   // --- FRUITS ---
   'identify-fruit': () => {
     return sample(FRUITS_DATA, 5).map(f => ({
@@ -413,6 +471,33 @@ const generators = {
       options: shuffle([f.name,...pickWrong(FRUITS_DATA,f,3).map(x=>x.name)]),
       correct: f.name
     }));
+  },
+
+  'fruit-color': () => {
+    const colorEmoji = { rojo:'🔴', amarillo:'🟡', verde:'🟢', morado:'🟣', naranja:'🟠' };
+    return sample(FRUITS_DATA, 6).map(f => ({
+      type: 'fruit-color',
+      question: `¿De qué color es la ${f.name}?`,
+      emoji: f.emoji,
+      options: shuffle([f.color, ...new Set(FRUITS_DATA.filter(x=>x.color!==f.color).map(x=>x.color))].slice(0,4)).map(c => `${colorEmoji[c]||'🎨'} ${c}`),
+      correct: `${colorEmoji[f.color]||'🎨'} ${f.color}`
+    }));
+  },
+
+  'classify-fruit': () => {
+    // Classify by color group: warm-colored fruit vs cool-colored fruit
+    const warm = FRUITS_DATA.filter(f => ['rojo','amarillo','naranja'].includes(f.color));
+    const cool = FRUITS_DATA.filter(f => ['verde','morado'].includes(f.color));
+    const items = [
+      ...sample(warm,3).map(f=>({...f,cat:'🔥 Rojo/Amarillo/Naranja'})),
+      ...sample(cool,3).map(f=>({...f,cat:'🌿 Verde/Morado'}))
+    ];
+    return [{ type: 'classify-two', question: 'Clasifica la fruta por su color', categories: ['🔥 Rojo/Amarillo/Naranja','🌿 Verde/Morado'], items: shuffle(items) }];
+  },
+
+  'memory-fruit': () => {
+    const pairs = sample(FRUITS_DATA, 4).map(f => ({ name: f.name, emoji: f.emoji }));
+    return [{ type: 'memory', pairs, gridCols: 4 }];
   },
 
   // --- TRANSPORT ---
@@ -434,6 +519,11 @@ const generators = {
       options: ['🛤️ Tierra','✈️ Aire','🌊 Agua'],
       correct: t.type === 'tierra' ? '🛤️ Tierra' : t.type === 'aire' ? '✈️ Aire' : '🌊 Agua'
     })).slice(0,5);
+  },
+
+  'memory-transport': () => {
+    const pairs = sample(TRANSPORT_DATA, 4).map(t => ({ name: t.name, emoji: t.emoji }));
+    return [{ type: 'memory', pairs, gridCols: 4 }];
   },
 
   // --- WORD-IMAGE ASSOCIATION ---
