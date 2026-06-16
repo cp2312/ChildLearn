@@ -255,19 +255,20 @@ const generators = {
     return [{ type: "memory", pairs, gridCols: 4 }];
   },
 
-  "habitat-animal": () => {
-    const animals = sample(
-      [...ANIMALS_DATA.domestic, ...ANIMALS_DATA.wild, ...ANIMALS_DATA.birds],
-      5,
-    );
-    return animals.map((a) => ({
-      type: "habitat",
-      question: `¿Dónde vive el ${a.name}?`,
-      emoji: a.emoji,
-      habitats: ["🏠 Casa", "🌿 Selva", "🌾 Sabana", "🌊 Mar", "🌲 Bosque"],
-      correct: `🏠 Casa`, // simplified - in real app map habitat properly
-    }));
-  },
+ "habitat-animal": () => {
+  const animals = sample(
+    [...ANIMALS_DATA.domestic, ...ANIMALS_DATA.wild, ...ANIMALS_DATA.birds],
+    5,
+  );
+
+  return animals.map((a) => ({
+    type: "habitat",
+    question: `¿Dónde vive el ${a.name}?`,
+    emoji: a.emoji,
+    options: ["🏠 Casa", "🌿 Selva", "🌾 Sabana", "🌊 Mar", "🌲 Bosque"],
+    correct: "🏠 Casa",
+  }));
+},
 
   // --- SOUNDS (environmental, non-animal) ---
   "identify-sound": () => {
