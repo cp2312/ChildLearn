@@ -440,23 +440,40 @@ export const ActivityRenderer = {
         SoundEngine.play('flip');
         el.classList.add('flipped');
         flipped.push(el);
-        if (flipped.length === 2) {
-          locked = true;
-          setTimeout(() => {
-            if (flipped[0].dataset.match === flipped[1].dataset.match && flipped[0] !== flipped[1]) {
-              flipped.forEach(c => c.classList.add('matched'));
-              matched.push(flipped[0].dataset.match);
-              SoundEngine.play('correct');
-              if (matched.length === q.pairs.length) {
-                setTimeout(() => this.onAnswer?.(true), 500);
-              }
-            } else {
-              SoundEngine.play('wrong');
-              setTimeout(() => flipped.forEach(c => c.classList.remove('flipped')), 800);
-            }
-            flipped = []; locked = false;
-          }, 900);
-        }
+       if (flipped.length === 2) {
+  locked = true;
+
+  const first = flipped[0];
+  const second = flipped[1];
+
+  setTimeout(() => {
+    if (
+      first.dataset.match === second.dataset.match &&
+      first !== second
+    ) {
+      first.classList.add('matched');
+      second.classList.add('matched');
+
+      matched.push(first.dataset.match);
+
+      SoundEngine.play('correct');
+
+      if (matched.length === q.pairs.length) {
+        setTimeout(() => this.onAnswer?.(true), 500);
+      }
+    } else {
+      SoundEngine.play('wrong');
+
+      setTimeout(() => {
+        first.classList.remove('flipped');
+        second.classList.remove('flipped');
+      }, 800);
+    }
+
+    flipped = [];
+    locked = false;
+  }, 900);
+}
       });
     });
   },
