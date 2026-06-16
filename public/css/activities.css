@@ -106,6 +106,7 @@
 
 /* ===== MEMORY GAME ===== */
 .memory-grid {
+  perspective: 1000px;
   display: grid;
   gap: 0.8rem;
   margin: 1rem auto;
@@ -196,6 +197,7 @@
   user-select: none;
 }
 .order-item:hover { transform: scale(1.08); border-color: white; }
+.order-item.selected { border-color: var(--accent, #FFE66D); background: rgba(255,230,109,0.25); transform: scale(1.08); box-shadow: 0 0 0 3px rgba(255,230,109,0.5); }
 .order-item.dragging { opacity: 0.5; cursor: grabbing; }
 .order-slots { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin: 1rem auto; }
 .order-slot {
