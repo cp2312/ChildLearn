@@ -112,20 +112,20 @@ const generators = {
   },
 
   // --- VOWELS ---
-  "recognize-vocal": () => {
-    return shuffle(VOWELS_DATA).map((v) => ({
-      type: "recognize-vocal",
-      question: "¿Cuál es esta letra?",
-      display: v.letter,
-      options: shuffle([
-        v.letter,
-        ...VOWELS_DATA.filter((x) => x.letter !== v.letter)
-          .map((x) => x.letter)
-          .slice(0, 3),
-      ]),
-      correct: v.letter,
-    }));
-  },
+ "recognize-vocal": () => {
+  return shuffle(VOWELS_DATA).map((v) => ({
+    type: "recognize-vocal",
+    question: "¿Cuál es esta letra?",
+    emoji: v.letter,
+    options: shuffle([
+      v.letter,
+      ...VOWELS_DATA.filter((x) => x.letter !== v.letter)
+        .map((x) => x.letter)
+        .slice(0, 3),
+    ]),
+    correct: v.letter,
+  }));
+},
 
   "listen-vocal": () => {
     return shuffle(VOWELS_DATA).map((v) => ({
