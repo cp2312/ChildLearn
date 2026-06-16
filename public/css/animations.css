@@ -1,0 +1,148 @@
+/* ===== KEYFRAME ANIMATIONS ===== */
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-12px); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  33% { transform: translateY(-10px) rotate(3deg); }
+  66% { transform: translateY(-6px) rotate(-2deg); }
+}
+
+@keyframes dotPulse {
+  0%, 100% { transform: scale(1); opacity: 0.5; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+  80% { transform: scale(1.15) rotate(3deg); }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px) rotate(-2deg); }
+  40% { transform: translateX(8px) rotate(2deg); }
+  60% { transform: translateX(-6px); }
+  80% { transform: translateX(6px); }
+}
+
+@keyframes correctPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.08); box-shadow: 0 0 30px rgba(34,197,94,0.7); }
+  100% { transform: scale(1); }
+}
+
+@keyframes slideInRight {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes slideInUp {
+  from { transform: translateY(30px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 8px 30px rgba(78,205,196,0.4); }
+  50% { box-shadow: 0 8px 50px rgba(78,205,196,0.8); }
+}
+
+@keyframes confettiFall {
+  0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+@keyframes starBurst {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  60% { transform: scale(1.3) rotate(15deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+@keyframes spinIn {
+  from { transform: rotate(-180deg) scale(0); opacity: 0; }
+  to { transform: rotate(0deg) scale(1); opacity: 1; }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg); }
+  25% { transform: rotate(-5deg); }
+  75% { transform: rotate(5deg); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.15); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.1); }
+  70% { transform: scale(1); }
+}
+
+/* ===== UTILITY ANIMATION CLASSES ===== */
+.animate-bounce { animation: bounce 1s infinite; }
+.animate-float { animation: float 4s infinite ease-in-out; }
+.animate-wiggle { animation: wiggle 0.5s ease; }
+.animate-pop { animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.animate-shake { animation: shake 0.4s ease; }
+.animate-fade { animation: fadeIn 0.3s ease; }
+.animate-slide-up { animation: slideInUp 0.4s ease; }
+.animate-spin-in { animation: spinIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+.animate-heartbeat { animation: heartbeat 1.5s infinite; }
+
+/* ===== TRANSITION HELPERS ===== */
+.transition-all { transition: all 0.3s ease; }
+.transition-fast { transition: all 0.15s ease; }
+
+/* ===== STAR ANIMATIONS FOR COMPLETION ===== */
+.star-appear {
+  display: inline-block;
+  animation: starBurst 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+}
+.star-appear:nth-child(1) { animation-delay: 0.1s; }
+.star-appear:nth-child(2) { animation-delay: 0.25s; }
+.star-appear:nth-child(3) { animation-delay: 0.4s; }
+
+/* ===== MASCOT ANIMATIONS ===== */
+.mascot-wave { animation: wiggle 0.5s ease 3; }
+.mascot-happy { animation: bounce 0.5s ease 3; }
+.mascot-sad { animation: shake 0.5s ease 1; }
+
+/* ===== CARD FLIP ===== */
+.flip-card {
+  perspective: 1000px;
+}
+.flip-card-inner {
+  transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-style: preserve-3d;
+}
+.flip-card.flipped .flip-card-inner {
+  transform: rotateY(180deg);
+}
+.flip-card-front, .flip-card-back {
+  backface-visibility: hidden;
+}
+.flip-card-back {
+  transform: rotateY(180deg);
+}
+
+/* ===== PROGRESS BAR FILL ===== */
+.progress-bar-animated {
+  transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

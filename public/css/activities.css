@@ -1,0 +1,360 @@
+/* ===== ACTIVITY CARDS IN CLASS MODE ===== */
+
+/* Base question container */
+.question-container {
+  width: 100%;
+  max-width: 900px;
+  text-align: center;
+}
+
+.question-title {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.8rem, 4vw, 3rem);
+  color: white;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 10px rgba(0,0,0,0.4);
+}
+
+.question-subtitle {
+  font-size: clamp(1rem, 2.5vw, 1.5rem);
+  color: rgba(255,255,255,0.8);
+  margin-bottom: 2rem;
+}
+
+/* ===== OPTIONS GRID ===== */
+.options-grid {
+  display: grid;
+  gap: 1rem;
+  margin: 1.5rem auto;
+  max-width: 800px;
+}
+
+.options-grid.cols-2 { grid-template-columns: repeat(2, 1fr); }
+.options-grid.cols-3 { grid-template-columns: repeat(3, 1fr); }
+.options-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+
+.option-btn {
+  background: rgba(255,255,255,0.12);
+  border: 3px solid rgba(255,255,255,0.25);
+  border-radius: 20px;
+  padding: 1.2rem;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: white;
+  font-family: 'Nunito', sans-serif;
+  font-size: clamp(0.9rem, 2vw, 1.4rem);
+  font-weight: 700;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 100px;
+  position: relative;
+  overflow: hidden;
+}
+
+.option-btn .opt-emoji { font-size: clamp(2rem, 5vw, 3.5rem); }
+.option-btn .opt-label { font-size: clamp(0.85rem, 1.8vw, 1.2rem); }
+
+.option-btn:hover {
+  transform: translateY(-4px) scale(1.03);
+  border-color: rgba(255,255,255,0.8);
+  background: rgba(255,255,255,0.2);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+}
+
+.option-btn.correct {
+  background: linear-gradient(135deg, #16a34a, #15803d);
+  border-color: #22c55e;
+  animation: correctPulse 0.5s ease;
+}
+
+.option-btn.wrong {
+  background: linear-gradient(135deg, #dc2626, #b91c1c);
+  border-color: #ef4444;
+  animation: shake 0.4s ease;
+}
+
+.option-btn.disabled { pointer-events: none; opacity: 0.6; }
+
+/* ===== COLOR ACTIVITIES ===== */
+.color-target {
+  width: clamp(100px, 20vw, 180px);
+  height: clamp(100px, 20vw, 180px);
+  border-radius: 50%;
+  margin: 0 auto 1.5rem;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  animation: float 3s infinite ease-in-out;
+  border: 5px solid rgba(255,255,255,0.5);
+}
+
+.color-option-btn {
+  width: clamp(70px, 12vw, 110px);
+  height: clamp(70px, 12vw, 110px);
+  border-radius: 50%;
+  border: 4px solid rgba(255,255,255,0.4);
+  cursor: pointer;
+  transition: all 0.25s;
+  display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 4px;
+  font-weight: 700; font-size: 0.75rem; color: rgba(255,255,255,0.9);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+}
+.color-option-btn:hover { transform: scale(1.15); border-color: white; box-shadow: 0 6px 20px rgba(0,0,0,0.4); }
+.color-options-row { display: flex; justify-content: center; gap: 1.2rem; flex-wrap: wrap; margin-top: 1rem; }
+
+/* ===== MEMORY GAME ===== */
+.memory-grid {
+  display: grid;
+  gap: 0.8rem;
+  margin: 1rem auto;
+  max-width: 700px;
+}
+.memory-grid.cols-4 { grid-template-columns: repeat(4, 1fr); }
+.memory-grid.cols-6 { grid-template-columns: repeat(6, 1fr); }
+
+.memory-card {
+  aspect-ratio: 1;
+  border-radius: 16px;
+  cursor: pointer;
+  position: relative;
+  transform-style: preserve-3d;
+  transition: transform 0.5s;
+}
+.memory-card.flipped { transform: rotateY(180deg); }
+.memory-card.matched .card-back { background: linear-gradient(135deg, #16a34a, #15803d); }
+
+.card-front, .card-back {
+  position: absolute; inset: 0;
+  border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  backface-visibility: hidden;
+  font-size: clamp(1.5rem, 4vw, 2.5rem);
+  border: 3px solid rgba(255,255,255,0.3);
+}
+.card-front {
+  background: linear-gradient(135deg, #4338CA, #7C3AED);
+  color: white;
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.5rem, 5vw, 3rem);
+}
+.card-back {
+  background: rgba(255,255,255,0.15);
+  transform: rotateY(180deg);
+}
+
+/* ===== MATCHING / DRAG ===== */
+.matching-container {
+  display: flex;
+  gap: 2rem;
+  justify-content: center;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.matching-col { display: flex; flex-direction: column; gap: 0.75rem; min-width: 180px; }
+.match-item {
+  background: rgba(255,255,255,0.15);
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 14px;
+  padding: 0.85rem 1.2rem;
+  font-size: clamp(1rem, 2.5vw, 1.4rem);
+  font-weight: 700;
+  color: white;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  min-height: 60px;
+  display: flex; align-items: center; justify-content: center;
+}
+.match-item:hover { border-color: white; background: rgba(255,255,255,0.25); }
+.match-item.selected { border-color: var(--accent); background: rgba(255,230,109,0.25); }
+.match-item.matched { background: rgba(34,197,94,0.3); border-color: #22c55e; pointer-events: none; }
+.match-item.wrong-match { animation: shake 0.4s ease; border-color: #ef4444; }
+
+/* ===== ORDERING ===== */
+.order-items {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin: 1rem auto;
+  max-width: 700px;
+}
+.order-item {
+  background: rgba(255,255,255,0.15);
+  border: 3px solid rgba(255,255,255,0.3);
+  border-radius: 14px;
+  padding: 0.85rem 1.5rem;
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(1.3rem, 3vw, 2rem);
+  color: white;
+  cursor: grab;
+  transition: all 0.2s;
+  user-select: none;
+}
+.order-item:hover { transform: scale(1.08); border-color: white; }
+.order-item.dragging { opacity: 0.5; cursor: grabbing; }
+.order-slots { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin: 1rem auto; }
+.order-slot {
+  min-width: 70px; min-height: 70px;
+  border: 3px dashed rgba(255,255,255,0.4);
+  border-radius: 14px;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.order-slot.drag-over { border-color: var(--accent); background: rgba(255,230,109,0.15); }
+.order-slot.filled { border-style: solid; background: rgba(255,255,255,0.15); }
+
+/* ===== COMPLETION CONFETTI ===== */
+.confetti-piece {
+  position: absolute;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+}
+
+/* ===== MATH ACTIVITIES ===== */
+.math-display {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin: 1.5rem auto;
+}
+.math-num {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(3rem, 8vw, 6rem);
+  color: var(--accent);
+  text-shadow: 0 4px 15px rgba(0,0,0,0.3);
+  min-width: 80px;
+  text-align: center;
+}
+.math-op {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  color: rgba(255,255,255,0.8);
+}
+.math-result {
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(3rem, 8vw, 6rem);
+  color: #A855F7;
+  min-width: 80px;
+  text-align: center;
+  border-bottom: 4px solid rgba(255,255,255,0.4);
+}
+
+/* ===== COUNT OBJECTS ===== */
+.count-objects {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  max-width: 600px;
+  margin: 1rem auto;
+}
+.count-obj {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  animation: popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) both;
+  cursor: default;
+}
+
+/* ===== SEQUENCE / PATTERN ===== */
+.pattern-row {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin: 1rem auto;
+}
+.pattern-item {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  background: rgba(255,255,255,0.1);
+  border-radius: 14px;
+  padding: 0.5rem 0.75rem;
+  border: 2px solid rgba(255,255,255,0.2);
+}
+.pattern-item.blank {
+  min-width: 80px; min-height: 80px;
+  border: 3px dashed rgba(255,255,255,0.5);
+  border-radius: 14px;
+  background: rgba(255,255,255,0.05);
+  display: flex; align-items: center; justify-content: center;
+  color: rgba(255,255,255,0.4);
+  font-size: 1.5rem;
+}
+
+/* ===== LISTENING ACTIVITY ===== */
+.listen-btn {
+  background: linear-gradient(135deg, var(--secondary), #0ea5e9);
+  border: none; border-radius: 50%;
+  width: clamp(80px, 15vw, 130px);
+  height: clamp(80px, 15vw, 130px);
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  cursor: pointer;
+  margin: 1rem auto;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+  box-shadow: 0 8px 30px rgba(78,205,196,0.4);
+  animation: pulse-glow 2s infinite;
+}
+.listen-btn:hover { transform: scale(1.1); }
+
+/* ===== WORD COMPLETION ===== */
+.word-display {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: center;
+  margin: 1.5rem auto;
+  flex-wrap: wrap;
+}
+.letter-box {
+  width: clamp(50px, 8vw, 80px);
+  height: clamp(60px, 10vw, 90px);
+  border-bottom: 4px solid rgba(255,255,255,0.6);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Fredoka One', cursive;
+  font-size: clamp(2rem, 5vw, 3rem);
+  color: white;
+}
+.letter-box.blank {
+  border: 3px dashed rgba(255,255,255,0.4);
+  border-radius: 10px;
+  background: rgba(255,255,255,0.05);
+  color: rgba(255,255,255,0.3);
+}
+
+/* ===== HABITAT ACTIVITY ===== */
+.habitat-scene {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+  max-width: 700px;
+  margin: 1rem auto;
+}
+.habitat-zone {
+  background: rgba(255,255,255,0.1);
+  border: 3px solid rgba(255,255,255,0.2);
+  border-radius: 20px;
+  padding: 1rem;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  min-height: 130px;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 0.5rem;
+}
+.habitat-zone:hover { border-color: white; background: rgba(255,255,255,0.2); }
+.habitat-zone .habitat-emoji { font-size: clamp(2rem, 5vw, 3rem); }
+.habitat-zone .habitat-name { font-weight: 700; font-size: clamp(0.9rem, 2vw, 1.2rem); }
+
+/* ===== MOBILE ADJUSTMENTS FOR CLASS MODE ===== */
+@media (max-width: 600px) {
+  .options-grid.cols-4 { grid-template-columns: repeat(2, 1fr); }
+  .options-grid.cols-3 { grid-template-columns: repeat(2, 1fr); }
+  .memory-grid.cols-6 { grid-template-columns: repeat(4, 1fr); }
+  .matching-container { flex-direction: column; align-items: center; }
+  .class-header { flex-wrap: wrap; }
+}

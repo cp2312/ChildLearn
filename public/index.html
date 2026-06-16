@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🌟 Santa Cruz Aprende - IETS Motavita</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/main.css">
+  <link rel="stylesheet" href="/css/activities.css">
+  <link rel="stylesheet" href="/css/animations.css">
+</head>
+<body>
+
+<!-- SPLASH SCREEN -->
+<div id="splash-screen" class="splash">
+  <div class="splash-content">
+    <div class="mascot-bounce">
+      <div class="mascot" id="splash-mascot">🦉</div>
+    </div>
+    <h1 class="splash-title">Santa Cruz<br><span>Aprende</span></h1>
+    <p class="splash-sub">I.E.T.S. Santa Cruz de Motavita</p>
+    <div class="loading-dots"><span></span><span></span><span></span></div>
+  </div>
+</div>
+
+<!-- LOGIN SCREEN -->
+<div id="login-screen" class="screen hidden">
+  <div class="login-bg">
+    <div class="floating-shapes">
+      <div class="shape s1">⭐</div><div class="shape s2">🌈</div>
+      <div class="shape s3">🎈</div><div class="shape s4">✨</div>
+      <div class="shape s5">🌟</div><div class="shape s6">🎉</div>
+    </div>
+  </div>
+  <div class="login-card">
+    <div class="login-header">
+      <div class="login-mascot">🦉</div>
+      <h2>¡Hola Profe!</h2>
+      <p>Ingresa tus datos para comenzar</p>
+    </div>
+    <form id="login-form" class="login-form">
+      <div class="input-group">
+        <span class="input-icon">📧</span>
+        <input type="email" id="login-email" placeholder="Correo electrónico" required>
+      </div>
+      <div class="input-group">
+        <span class="input-icon">🔑</span>
+        <input type="password" id="login-password" placeholder="Contraseña" required>
+      </div>
+      <button type="submit" class="btn-login" id="login-btn">
+        <span>Entrar</span> 🚀
+      </button>
+      <div id="login-error" class="error-msg hidden"></div>
+    </form>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="app" class="hidden">
+
+  <!-- TOP NAV -->
+  <nav class="top-nav" id="main-nav">
+    <div class="nav-left">
+      <div class="nav-logo">🦉 Santa Cruz Aprende</div>
+    </div>
+    <div class="nav-center">
+      <div class="teacher-badge">
+        <span class="teacher-icon">👩‍🏫</span>
+        <span id="teacher-name">Profe</span>
+      </div>
+    </div>
+    <div class="nav-right">
+      <button class="nav-btn active" data-section="dashboard">🏠 Inicio</button>
+      <button class="nav-btn" data-section="activities">📚 Actividades</button>
+      <button class="nav-btn" data-section="progress">📊 Progreso</button>
+      <button class="nav-btn" data-section="settings">⚙️ Config</button>
+      <button class="nav-btn logout-btn" id="logout-btn">🚪 Salir</button>
+    </div>
+    <button class="nav-mobile-menu" id="mobile-menu-btn">☰</button>
+  </nav>
+
+  <!-- DASHBOARD -->
+  <section id="section-dashboard" class="section active">
+    <div class="dashboard-hero">
+      <div class="hero-mascot">
+        <div class="mascot-container">
+          <div class="mascot-char">🦉</div>
+          <div class="mascot-speech" id="mascot-speech">¡Bienvenido/a, Profe! ¿Qué vamos a aprender hoy?</div>
+        </div>
+      </div>
+      <div class="hero-info">
+        <h1>¡Buenos días, <span id="hero-teacher-name">Profe</span>! 🌟</h1>
+        <p>Selecciona un grupo para iniciar la clase</p>
+        <div class="group-selector" id="group-selector">
+          <!-- Groups populated by JS -->
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-grades">
+      <h2 class="section-title">📚 Grados</h2>
+      <div class="grades-grid">
+        <div class="grade-card" data-grade="prejarden">
+          <div class="grade-emoji">🌱</div>
+          <h3>Pre Jardín</h3>
+          <p>3 - 4 años</p>
+          <div class="grade-topics">7 temas</div>
+          <div class="grade-stars">⭐⭐⭐</div>
+        </div>
+        <div class="grade-card" data-grade="jardin">
+          <div class="grade-emoji">🌸</div>
+          <h3>Jardín</h3>
+          <p>4 - 5 años</p>
+          <div class="grade-topics">7 temas</div>
+          <div class="grade-stars">⭐⭐⭐</div>
+        </div>
+        <div class="grade-card" data-grade="transicion">
+          <div class="grade-emoji">🌺</div>
+          <h3>Transición</h3>
+          <p>5 - 6 años</p>
+          <div class="grade-topics">8 temas</div>
+          <div class="grade-stars">⭐⭐⭐</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="dashboard-stats" id="dashboard-stats">
+      <h2 class="section-title">📈 Resumen de hoy</h2>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon">🎯</div>
+          <div class="stat-value" id="stat-sessions">0</div>
+          <div class="stat-label">Actividades hoy</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">⭐</div>
+          <div class="stat-value" id="stat-score">0%</div>
+          <div class="stat-label">Promedio grupo</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🏆</div>
+          <div class="stat-value" id="stat-topics">0</div>
+          <div class="stat-label">Temas vistos</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon">🔥</div>
+          <div class="stat-value" id="stat-streak">0</div>
+          <div class="stat-label">Días seguidos</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ACTIVITIES SECTION -->
+  <section id="section-activities" class="section hidden">
+    <div class="activities-header">
+      <button class="back-btn" id="back-to-dashboard">← Volver</button>
+      <h2 id="activities-grade-title">Selecciona un grado</h2>
+    </div>
+
+    <!-- Grade Topics View -->
+    <div id="topics-view">
+      <div class="topics-grid" id="topics-grid">
+        <!-- Topics populated by JS -->
+      </div>
+    </div>
+
+    <!-- Topic Activities View -->
+    <div id="activities-view" class="hidden">
+      <div class="activities-list" id="activities-list">
+        <!-- Activities populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- PROGRESS SECTION -->
+  <section id="section-progress" class="section hidden">
+    <div class="progress-header">
+      <h2>📊 Seguimiento del Grupo</h2>
+      <div class="progress-filters">
+        <select id="filter-group" class="filter-select">
+          <option value="">Todos los grupos</option>
+        </select>
+        <select id="filter-period" class="filter-select">
+          <option value="7">Últimos 7 días</option>
+          <option value="30">Último mes</option>
+          <option value="90">Últimos 3 meses</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="progress-overview">
+      <div class="progress-cards" id="progress-cards">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <div class="topics-mastery" id="topics-mastery">
+      <h3>🎯 Dominio por tema</h3>
+      <div id="mastery-bars"><!-- Populated by JS --></div>
+    </div>
+
+    <div class="history-section">
+      <h3>📋 Historial de clases</h3>
+      <div class="history-list" id="history-list">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+  </section>
+
+  <!-- SETTINGS SECTION -->
+  <section id="section-settings" class="section hidden">
+    <h2>⚙️ Configuración</h2>
+    <div class="settings-grid">
+      <div class="settings-card">
+        <h3>👩‍🏫 Mi perfil</h3>
+        <div id="profile-info"></div>
+        <button class="btn-secondary" id="edit-groups-btn">Editar mis grupos</button>
+      </div>
+      <div class="settings-card">
+        <h3>🔊 Audio</h3>
+        <label class="toggle-label">
+          <span>Efectos de sonido</span>
+          <div class="toggle" id="sound-toggle">
+            <input type="checkbox" checked id="sound-enabled">
+            <span class="toggle-slider"></span>
+          </div>
+        </label>
+        <label class="toggle-label">
+          <span>Música de fondo</span>
+          <div class="toggle">
+            <input type="checkbox" id="music-enabled">
+            <span class="toggle-slider"></span>
+          </div>
+        </label>
+      </div>
+      <div class="settings-card">
+        <h3>🎨 Temas</h3>
+        <div class="theme-options">
+          <button class="theme-btn active" data-theme="colorful">🌈 Colorido</button>
+          <button class="theme-btn" data-theme="ocean">🌊 Océano</button>
+          <button class="theme-btn" data-theme="forest">🌿 Bosque</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<!-- CLASS MODE OVERLAY (Fullscreen) -->
+<div id="class-mode" class="class-mode hidden">
+  <div class="class-header">
+    <div class="class-info">
+      <span id="class-topic-name">Tema</span>
+      <span id="class-activity-name">Actividad</span>
+    </div>
+    <div class="class-progress-bar">
+      <div class="class-progress-fill" id="class-progress-fill"></div>
+    </div>
+    <div class="class-controls">
+      <div class="class-score">
+        <span>⭐</span><span id="class-score">0</span>
+      </div>
+      <button class="class-exit-btn" id="class-exit-btn">✕ Salir</button>
+    </div>
+  </div>
+
+  <div class="class-body" id="class-body">
+    <!-- Activity content rendered here -->
+  </div>
+
+  <div class="class-footer">
+    <button class="class-btn secondary" id="class-prev-btn">← Anterior</button>
+    <div class="class-dots" id="class-dots"></div>
+    <button class="class-btn primary" id="class-next-btn">Siguiente →</button>
+  </div>
+
+  <!-- Feedback overlays -->
+  <div class="feedback-overlay hidden" id="feedback-correct">
+    <div class="feedback-content">
+      <div class="feedback-emoji">🎉</div>
+      <div class="feedback-text">¡Correcto!</div>
+      <div class="feedback-stars">⭐⭐⭐</div>
+    </div>
+  </div>
+  <div class="feedback-overlay hidden" id="feedback-wrong">
+    <div class="feedback-content">
+      <div class="feedback-emoji">💪</div>
+      <div class="feedback-text">¡Inténtalo de nuevo!</div>
+    </div>
+  </div>
+
+  <!-- Completion screen -->
+  <div class="completion-screen hidden" id="completion-screen">
+    <div class="completion-content">
+      <div class="completion-confetti" id="completion-confetti"></div>
+      <div class="completion-trophy">🏆</div>
+      <h2>¡Actividad Completada!</h2>
+      <div class="completion-stars" id="completion-stars"></div>
+      <div class="completion-score">
+        <div class="score-circle">
+          <span id="final-score">0</span>
+          <small>puntos</small>
+        </div>
+        <div class="score-pct">
+          <span id="final-pct">0%</span>
+          <small>correctas</small>
+        </div>
+      </div>
+      <div class="completion-medal" id="completion-medal"></div>
+      <div class="completion-buttons">
+        <button class="btn-primary" id="save-result-btn">💾 Guardar resultado</button>
+        <button class="btn-secondary" id="retry-btn">🔄 Repetir</button>
+        <button class="btn-outline" id="exit-activity-btn">🏠 Menú principal</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="modal-overlay" class="modal-overlay hidden">
+  <div class="modal-box" id="modal-box">
+    <button class="modal-close" id="modal-close">✕</button>
+    <div id="modal-content"></div>
+  </div>
+</div>
+
+<!-- TOAST NOTIFICATIONS -->
+<div id="toast-container"></div>
+
+<!-- Firebase SDK -->
+<script type="module" src="/js/firebase-init.js"></script>
+<script type="module" src="/js/app.js"></script>
+</body>
+</html>
