@@ -308,24 +308,24 @@ export const ANIMALS_DATA = {
     { name: "Oveja", emoji: "🐑", sound: "Beee", habitat: "granja", eng: "Sheep" }
   ],
   wild: [
-    { name: "León", emoji: "🦁", sound: "Roar", habitat: "sabana", eng: "Lion" },
-    { name: "Elefante", emoji: "🐘", sound: "Barritar", habitat: "sabana", eng: "Elephant" },
+    { name: "León", emoji: "🦁", sound: "Roooar", habitat: "sabana", eng: "Lion" },
+    { name: "Elefante", emoji: "🐘", sound: "Pruuum", habitat: "sabana", eng: "Elephant" },
     { name: "Mono", emoji: "🐒", sound: "Ji ji ji", habitat: "selva", eng: "Monkey" },
     { name: "Tigre", emoji: "🐯", sound: "Grrrr", habitat: "selva", eng: "Tiger" },
-    { name: "Oso", emoji: "🐻", sound: "Gruñir", habitat: "bosque", eng: "Bear" },
-    { name: "Jirafa", emoji: "🦒", sound: "Silencio", habitat: "sabana", eng: "Giraffe" },
-    { name: "Cebra", emoji: "🦓", sound: "Relincho", habitat: "sabana", eng: "Zebra" },
-    { name: "Hipopótamo", emoji: "🦛", sound: "Gruñido", habitat: "río", eng: "Hippo" }
+    { name: "Oso", emoji: "🐻", sound: "Uhmm uhmm", habitat: "bosque", eng: "Bear" },
+    { name: "Jirafa", emoji: "🦒", sound: "Mmmh", habitat: "sabana", eng: "Giraffe" },
+    { name: "Cebra", emoji: "🦓", sound: "Hiii hiii", habitat: "sabana", eng: "Zebra" },
+    { name: "Hipopótamo", emoji: "🦛", sound: "Jom jom", habitat: "río", eng: "Hippo" }
   ],
   birds: [
     { name: "Pájaro", emoji: "🐦", sound: "Pío pío", habitat: "árbol", eng: "Bird" },
-    { name: "Pinguino", emoji: "🐧", sound: "Squeak", habitat: "polo", eng: "Penguin" },
+    { name: "Pinguino", emoji: "🐧", sound: "Cuic cuic", habitat: "polo", eng: "Penguin" },
     { name: "Pato", emoji: "🦆", sound: "Cuac cuac", habitat: "lago", eng: "Duck" },
     { name: "Búho", emoji: "🦉", sound: "Uuu uuu", habitat: "árbol", eng: "Owl" }
   ],
   marine: [
     { name: "Pez", emoji: "🐟", sound: "", habitat: "mar", eng: "Fish" },
-    { name: "Delfín", emoji: "🐬", sound: "Click click", habitat: "mar", eng: "Dolphin" },
+    { name: "Delfín", emoji: "🐬", sound: "Ii ii ii", habitat: "mar", eng: "Dolphin" },
     { name: "Tortuga", emoji: "🐢", sound: "", habitat: "mar", eng: "Turtle" }
   ]
 };
