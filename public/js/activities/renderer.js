@@ -49,9 +49,15 @@ export const ActivityRenderer = {
       case 'image-vocal':
       case 'word-image':
         return this._renderImageVocal(question, container);
+      case 'object-use':
+        return this._renderMultipleChoice(question, container);
       case 'count-objects':
       case 'relate-number':
         return this._renderCountObjects(question, container);
+      case 'compare-quantities':
+        return this._renderCompareQuantities(question, container);
+      case 'before-after':
+        return this._renderMultipleChoice(question, container);
       case 'select-number':
       case 'number-sequence':
         return this._renderMultipleChoice(question, container);
@@ -61,11 +67,19 @@ export const ActivityRenderer = {
         return this._renderOrderSequence(question, container);
       case 'sum-objects':
         return this._renderSumObjects(question, container);
+      case 'sub-objects':
+        return this._renderSubObjects(question, container);
       case 'sum-numbers':
       case 'sub-numbers':
         return this._renderMathQuestion(question, container);
+      case 'complete-sum':
+      case 'complete-sub':
+        return this._renderCompleteEquation(question, container);
+      case 'word-sum':
+        return this._renderMultipleChoice(question, container);
       case 'eng-colors':
       case 'eng-numbers':
+      case 'eng-colors-shapes':
       case 'eng-animals':
       case 'eng-greetings':
       case 'eng-body':
@@ -73,17 +87,23 @@ export const ActivityRenderer = {
       case 'memory':
       case 'memory-bilingual':
         return this._renderMemoryGame(question, container);
+      case 'sequence-memory':
+        return this._renderSequenceMemory(question, container);
       case 'classify-two':
       case 'classify-three':
         return this._renderClassifyTwo(question, container);
       case 'matching-pairs':
         return this._renderMatchingPairs(question, container);
+      case 'shadow-matching':
+        return this._renderShadowMatching(question, container);
       case 'odd-one-out':
         return this._renderOddOneOut(question, container);
       case 'select-alike':
         return this._renderSelectAlike(question, container);
       case 'pattern':
         return this._renderPattern(question, container);
+      case 'find-differences':
+        return this._renderFindDifferences(question, container);
       case 'classify-transport':
         return this._renderMultipleChoice(question, container);
       default:
@@ -249,6 +269,35 @@ export const ActivityRenderer = {
           ${partsRow}
         </div>
         <div class="options-grid cols-2" style="margin-top:1rem">
+          ${q.options.map(opt => `
+            <button class="option-btn" data-answer="${opt}">
+              <span class="opt-label">${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', q.correct);
+  },
+
+  // ===== COMPARE QUANTITIES (two groups side by side) =====
+  _renderCompareQuantities(q, container) {
+    const groupA = Array(q.a).fill(q.emoji).join(' ');
+    const groupB = Array(q.b).fill(q.emoji).join(' ');
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div style="display:flex;gap:2rem;justify-content:center;flex-wrap:wrap;margin:1.25rem 0">
+          <div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:1rem 1.5rem;min-width:160px">
+            <div style="font-weight:700;margin-bottom:0.5rem;opacity:0.8">Grupo A</div>
+            <div style="font-size:clamp(1.5rem,4vw,2.2rem);letter-spacing:4px">${groupA}</div>
+          </div>
+          <div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:1rem 1.5rem;min-width:160px">
+            <div style="font-weight:700;margin-bottom:0.5rem;opacity:0.8">Grupo B</div>
+            <div style="font-size:clamp(1.5rem,4vw,2.2rem);letter-spacing:4px">${groupB}</div>
+          </div>
+        </div>
+        <div class="options-grid cols-3" style="margin-top:1rem">
           ${q.options.map(opt => `
             <button class="option-btn" data-answer="${opt}">
               <span class="opt-label">${opt}</span>
@@ -469,6 +518,59 @@ export const ActivityRenderer = {
     });
   },
 
+  // ===== COMPLETE EQUATION (a OP ? = result) =====
+  _renderCompleteEquation(q, container) {
+    const isSum = q.type === 'complete-sum';
+    const op = isSum ? '+' : '−';
+    const a = q.a;
+    const result = isSum ? q.total : q.result;
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="math-display">
+          <div class="math-num">${a}</div>
+          <div class="math-op">${op}</div>
+          <div class="math-result" style="border-bottom:4px dashed rgba(255,255,255,0.5)">?</div>
+          <div class="math-op">=</div>
+          <div class="math-num">${result}</div>
+        </div>
+        <div class="options-grid cols-2" style="max-width:400px;margin-top:1.5rem">
+          ${q.options.map(opt => `
+            <button class="option-btn" data-answer="${opt}">
+              <span class="opt-label" style="font-size:2.5rem;font-family:'Fredoka One',cursive">${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', String(q.correct), (btn) => {
+      const res = container.querySelector('.math-result');
+      if (res) res.textContent = btn.dataset.answer;
+    });
+  },
+
+  // ===== SUB OBJECTS (visual subtraction: cross out removed items) =====
+  _renderSubObjects(q, container) {
+    const items = Array.from({ length: q.total }, (_, i) =>
+      `<span class="count-obj" style="${i < q.b ? 'opacity:0.25;text-decoration:line-through' : ''}">${q.emoji}</span>`
+    ).join('');
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="count-objects">${items}</div>
+        <div class="question-subtitle" style="margin-top:0.5rem;opacity:0.7">Los tachados ya no cuentan</div>
+        <div class="options-grid cols-2" style="margin-top:1.5rem;max-width:400px">
+          ${q.options.map(opt => `
+            <button class="option-btn" data-answer="${opt}">
+              <span class="opt-label" style="font-size:2.5rem;font-family:'Fredoka One',cursive">${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', String(q.correct));
+  },
+
   // ===== MATH QUESTION =====
   _renderMathQuestion(q, container) {
     const op = q.type === 'sum-numbers' ? '+' : '−';
@@ -589,6 +691,66 @@ export const ActivityRenderer = {
     locked = false;
   }, 900);
 }
+      });
+    });
+  },
+
+  // ===== SHADOW MATCHING (right column shown as dark silhouettes) =====
+  _renderShadowMatching(q, container) {
+    let selectedLeft = null;
+    let matchedCount = 0;
+    const shuffledRight = this._shuffleArr([...q.pairs]);
+
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="matching-container">
+          <div class="matching-col" id="shadow-left">
+            ${q.pairs.map((p, i) => `
+              <div class="match-item" data-idx="${i}" data-side="left">${p.left.emoji} ${p.left.label}</div>
+            `).join('')}
+          </div>
+          <div class="matching-col" id="shadow-right">
+            ${shuffledRight.map((p) => `
+              <div class="match-item" data-idx="${q.pairs.indexOf(p)}" data-side="right" style="filter:brightness(0) opacity(0.7)">${p.right.emoji}</div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const leftItems = container.querySelectorAll('[data-side="left"]');
+    const rightItems = container.querySelectorAll('[data-side="right"]');
+
+    leftItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (item.classList.contains('matched')) return;
+        leftItems.forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        selectedLeft = item;
+      });
+    });
+
+    rightItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (!selectedLeft || item.classList.contains('matched')) return;
+        const isCorrect = selectedLeft.dataset.idx === item.dataset.idx;
+        if (isCorrect) {
+          selectedLeft.classList.add('matched');
+          selectedLeft.classList.remove('selected');
+          item.classList.add('matched');
+          item.style.filter = 'none'; // reveal the real shadow color on success
+          SoundEngine.play('correct');
+          matchedCount++;
+          selectedLeft = null;
+          if (matchedCount === q.pairs.length) {
+            setTimeout(() => this.onAnswer?.(true), 500);
+          }
+        } else {
+          item.classList.add('wrong-match');
+          SoundEngine.play('wrong');
+          setTimeout(() => item.classList.remove('wrong-match'), 500);
+        }
       });
     });
   },
@@ -776,6 +938,100 @@ export const ActivityRenderer = {
       SoundEngine.play(isCorrect ? 'correct' : 'wrong');
       setTimeout(() => this.onAnswer?.(isCorrect), 900);
     });
+  },
+
+  // ===== SEQUENCE MEMORY (Simon-says style) =====
+  _renderSequenceMemory(q, container) {
+    let userInput = [];
+    let showingSequence = true;
+
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div id="seq-status" style="margin:0.75rem 0;font-size:1.1rem;opacity:0.85">👀 Observa con atención...</div>
+        <div class="options-grid cols-2" id="seq-icons" style="max-width:320px;pointer-events:none;opacity:0.6">
+          ${q.icons.map(icon => `
+            <button class="option-btn" data-icon="${icon}">
+              <span class="opt-emoji">${icon}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+
+    const buttons = container.querySelectorAll('#seq-icons .option-btn');
+    const statusEl = container.querySelector('#seq-status');
+
+    const highlight = (icon) => {
+      const btn = Array.from(buttons).find(b => b.dataset.icon === icon);
+      if (!btn) return;
+      btn.style.transform = 'scale(1.2)';
+      btn.style.background = 'rgba(255,230,109,0.4)';
+      SoundEngine.play('click');
+      setTimeout(() => {
+        btn.style.transform = '';
+        btn.style.background = '';
+      }, 450);
+    };
+
+    // Play the sequence visually, one icon at a time
+    q.sequence.forEach((icon, i) => {
+      setTimeout(() => highlight(icon), i * 700);
+    });
+
+    // After the sequence finishes, enable input
+    setTimeout(() => {
+      showingSequence = false;
+      statusEl.textContent = '👉 Ahora repite la secuencia';
+      container.querySelector('#seq-icons').style.pointerEvents = 'auto';
+      container.querySelector('#seq-icons').style.opacity = '1';
+    }, q.sequence.length * 700 + 300);
+
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        if (showingSequence) return;
+        userInput.push(btn.dataset.icon);
+        highlight(btn.dataset.icon);
+
+        const idx = userInput.length - 1;
+        if (userInput[idx] !== q.sequence[idx]) {
+          SoundEngine.play('wrong');
+          statusEl.textContent = '💪 ¡Casi! Observa de nuevo';
+          setTimeout(() => this.onAnswer?.(false), 800);
+          return;
+        }
+
+        if (userInput.length === q.sequence.length) {
+          SoundEngine.play('correct');
+          statusEl.textContent = '🎉 ¡Perfecto!';
+          setTimeout(() => this.onAnswer?.(true), 800);
+        }
+      });
+    });
+  },
+
+  // ===== FIND DIFFERENCES (two rows, pick the position that changed) =====
+  _renderFindDifferences(q, container) {
+    const rowA = q.sceneA.map((e, i) => `<span style="font-size:clamp(2rem,5vw,3rem)">${e}</span>`).join(' ');
+    const rowB = q.sceneB.map((e, i) => `<span style="font-size:clamp(2rem,5vw,3rem)">${e}</span>`).join(' ');
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div style="display:flex;flex-direction:column;gap:1rem;align-items:center;margin:1.25rem 0">
+          <div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:0.75rem 1.5rem;display:flex;gap:1rem">${rowA}</div>
+          <div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:0.75rem 1.5rem;display:flex;gap:1rem">${rowB}</div>
+        </div>
+        <div class="question-subtitle" style="margin-bottom:0.5rem;opacity:0.7">¿En qué posición está la diferencia?</div>
+        <div class="options-grid cols-4" style="max-width:400px">
+          ${q.options.map(opt => `
+            <button class="option-btn" data-answer="${opt}">
+              <span class="opt-label">${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', q.correct);
   },
 
   // ===== ODD ONE OUT =====

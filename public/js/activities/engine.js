@@ -460,6 +460,97 @@ const generators = {
     });
   },
 
+  "count-to-20": () => {
+    // Same mechanic as count-objects but with the full 1-20 range for Transición level
+    return Array.from({ length: 6 }, () => {
+      const count = Math.floor(Math.random() * 20) + 1;
+      const emojis = ["🍎", "🌟", "🐾", "🎈", "🦋", "🌸", "🔴", "💧", "🎯"];
+      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+      return {
+        type: "count-objects",
+        question: "¿Cuántos hay? (cuenta con cuidado)",
+        emoji,
+        count,
+        options: shuffle(
+          [
+            count,
+            ...new Set(
+              [count - 1, count + 1, count + 2, count - 2].filter(
+                (n) => n > 0 && n <= 20 && n !== count,
+              ),
+            ),
+          ].slice(0, 4),
+        ),
+        correct: count,
+      };
+    });
+  },
+
+  "compare-quantities": () => {
+    // Compare two groups of objects: more, less, or equal
+    const emojis = ["🍎", "⭐", "🎈", "🐾"];
+    return Array.from({ length: 6 }, () => {
+      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+      const a = Math.floor(Math.random() * 8) + 1;
+      const b = Math.floor(Math.random() * 8) + 1;
+      let correct;
+      if (a > b) correct = "El grupo A";
+      else if (b > a) correct = "El grupo B";
+      else correct = "Son iguales";
+      return {
+        type: "compare-quantities",
+        question: "¿Cuál grupo tiene más, o son iguales?",
+        emoji,
+        a,
+        b,
+        options: shuffle(["El grupo A", "El grupo B", "Son iguales"]),
+        correct,
+      };
+    });
+  },
+
+  "skip-count": () => {
+    // Counting by 2s, starting from a small even or odd number
+    return Array.from({ length: 5 }, () => {
+      const start = (Math.floor(Math.random() * 5) + 1) * 2 - 2 || 2; // 2,4,6,8,10
+      const seq = [start, start + 2, start + 4, "?", start + 8];
+      const correct = start + 6;
+      return {
+        type: "number-sequence",
+        question: "Contando de 2 en 2, ¿qué número sigue?",
+        sequence: seq,
+        options: shuffle([
+          correct,
+          correct + 2,
+          correct - 2,
+          correct + 1,
+        ]),
+        correct,
+      };
+    });
+  },
+
+  "before-after": () => {
+    // "What number comes before/after X"
+    return Array.from({ length: 6 }, () => {
+      const n = Math.floor(Math.random() * 18) + 2; // 2-19 so before/after stay in 1-20
+      const askBefore = Math.random() > 0.5;
+      const correct = askBefore ? n - 1 : n + 1;
+      return {
+        type: "before-after",
+        question: askBefore ? `¿Qué número va ANTES de ${n}?` : `¿Qué número va DESPUÉS de ${n}?`,
+        emoji: String(n),
+        options: shuffle([
+          correct,
+          n,
+          correct + 1 > 20 ? correct - 2 : correct + 1,
+          correct - 1 < 1 ? correct + 2 : correct - 1,
+        ]),
+        correct,
+      };
+    });
+  },
+
   "select-number": () => {
     return Array.from({ length: 6 }, () => {
       const n = Math.floor(Math.random() * 19) + 1;
@@ -734,6 +825,104 @@ const generators = {
     });
   },
 
+  "sub-objects": () => {
+    // Visual subtraction: show total objects, "remove" b of them, ask what remains
+    return Array.from({ length: 6 }, () => {
+      const total = Math.floor(Math.random() * 6) + 4;
+      const b = Math.floor(Math.random() * (total - 1)) + 1;
+      const res = total - b;
+      const emojis = ["🍎", "⭐", "🎈", "🐾", "🌸"];
+      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+      return {
+        type: "sub-objects",
+        total,
+        b,
+        res,
+        emoji,
+        question: `Hay ${total} y se quitan ${b}. ¿Cuántos quedan?`,
+        options: shuffle(
+          [res, ...[res - 1, res + 1, res + 2].filter((n) => n >= 0)].slice(0, 4),
+        ),
+        correct: res,
+      };
+    });
+  },
+
+  "complete-sum": () => {
+    // Fill in the missing addend: a + ? = total
+    return Array.from({ length: 6 }, () => {
+      const a = Math.floor(Math.random() * 7) + 1;
+      const missing = Math.floor(Math.random() * 7) + 1;
+      const total = a + missing;
+      return {
+        type: "complete-sum",
+        a,
+        total,
+        missing,
+        question: `¿Qué número falta? ${a} + ? = ${total}`,
+        options: shuffle(
+          [
+            missing,
+            ...[missing - 1, missing + 1, missing + 2, missing - 2].filter(
+              (n) => n >= 0,
+            ),
+          ].slice(0, 4),
+        ),
+        correct: missing,
+      };
+    });
+  },
+
+  "complete-sub": () => {
+    // Fill in the missing subtrahend: a - ? = result
+    return Array.from({ length: 6 }, () => {
+      const result = Math.floor(Math.random() * 6) + 1;
+      const missing = Math.floor(Math.random() * 6) + 1;
+      const a = result + missing;
+      return {
+        type: "complete-sub",
+        a,
+        result,
+        missing,
+        question: `¿Qué número falta? ${a} - ? = ${result}`,
+        options: shuffle(
+          [
+            missing,
+            ...[missing - 1, missing + 1, missing + 2, missing - 2].filter(
+              (n) => n >= 0,
+            ),
+          ].slice(0, 4),
+        ),
+        correct: missing,
+      };
+    });
+  },
+
+  "word-sum": () => {
+    // Simple word problems using everyday items, age-appropriate for Transición
+    const templates = [
+      { item: "manzanas", emoji: "🍎" },
+      { item: "globos", emoji: "🎈" },
+      { item: "estrellas", emoji: "⭐" },
+      { item: "perritos", emoji: "🐕" },
+    ];
+    return Array.from({ length: 5 }, () => {
+      const t = templates[Math.floor(Math.random() * templates.length)];
+      const a = Math.floor(Math.random() * 5) + 1;
+      const b = Math.floor(Math.random() * 5) + 1;
+      const total = a + b;
+      return {
+        type: "word-sum",
+        emoji: t.emoji,
+        question: `Tengo ${a} ${t.item} y me regalan ${b} más. ¿Cuántos ${t.item} tengo ahora?`,
+        options: shuffle(
+          [total, ...[total - 1, total + 1, total + 2].filter((n) => n > 0)].slice(0, 4),
+        ),
+        correct: total,
+      };
+    });
+  },
+
   // --- ENGLISH ---
   "eng-colors": () => {
     return sample(COLORS_DATA, 6).map((c) => ({
@@ -808,6 +997,91 @@ const generators = {
     }));
   },
 
+  "eng-colors-shapes": () => {
+    // Mix of colors and shapes in English, for Transición review level
+    const pool = [
+      ...COLORS_DATA.map((c) => ({ name: c.name, eng: c.eng, emoji: c.emoji })),
+      ...SHAPES_DATA.map((s) => ({ name: s.name, eng: s.eng, emoji: s.emoji })),
+    ];
+    return sample(pool, 6).map((item) => ({
+      type: "eng-colors-shapes",
+      question: `¿Cómo se dice "${item.name}" en inglés?`,
+      emoji: item.emoji,
+      options: shuffle([
+        item.eng,
+        ...pool.filter((x) => x.eng !== item.eng).map((x) => x.eng).sort(() => Math.random() - 0.5).slice(0, 3),
+      ]),
+      correct: item.eng,
+    }));
+  },
+
+  "eng-numbers-20": () => {
+    const numbersEng = [
+      { n: 1, eng: "One" }, { n: 2, eng: "Two" }, { n: 3, eng: "Three" },
+      { n: 4, eng: "Four" }, { n: 5, eng: "Five" }, { n: 6, eng: "Six" },
+      { n: 7, eng: "Seven" }, { n: 8, eng: "Eight" }, { n: 9, eng: "Nine" },
+      { n: 10, eng: "Ten" }, { n: 11, eng: "Eleven" }, { n: 12, eng: "Twelve" },
+      { n: 13, eng: "Thirteen" }, { n: 14, eng: "Fourteen" }, { n: 15, eng: "Fifteen" },
+      { n: 16, eng: "Sixteen" }, { n: 17, eng: "Seventeen" }, { n: 18, eng: "Eighteen" },
+      { n: 19, eng: "Nineteen" }, { n: 20, eng: "Twenty" },
+    ];
+    return sample(numbersEng, 6).map((item) => ({
+      type: "eng-numbers",
+      question: `¿Cómo se dice el número "${item.n}" en inglés?`,
+      emoji: String(item.n),
+      options: shuffle([
+        item.eng,
+        ...numbersEng.filter((x) => x.n !== item.n).map((x) => x.eng).sort(() => Math.random() - 0.5).slice(0, 3),
+      ]),
+      correct: item.eng,
+    }));
+  },
+
+  "eng-wild-animals": () => {
+    return sample(ANIMALS_DATA.wild, 6).map((a) => ({
+      type: "eng-animals",
+      question: `¿Cómo se dice "${a.name}" en inglés?`,
+      emoji: a.emoji,
+      options: shuffle([
+        a.eng,
+        ...pickWrong(ANIMALS_DATA.wild, a, 3).map((x) => x.eng),
+      ]),
+      correct: a.eng,
+    }));
+  },
+
+  "eng-word-memory": () => {
+    // Bilingual memory using a varied pool (animals + fruits), not just colors
+    const pool = [
+      ...ANIMALS_DATA.domestic.map((a) => ({ name: a.name, emoji: a.emoji, eng: a.eng })),
+      ...FRUITS_DATA.map((f) => ({ name: f.name, emoji: f.emoji, eng: f.eng })),
+    ];
+    const chosen = sample(pool, 4).map((item) => ({
+      name: item.name,
+      emoji: item.emoji,
+      pair: item.eng,
+    }));
+    return [{ type: "memory-bilingual", pairs: chosen, gridCols: 4 }];
+  },
+
+  "eng-word-match": () => {
+    // Match an English word to its corresponding image (emoji)
+    const pool = [
+      ...ANIMALS_DATA.domestic.map((a) => ({ label: a.eng, emoji: a.emoji })),
+      ...FRUITS_DATA.map((f) => ({ label: f.eng, emoji: f.emoji })),
+      ...COLORS_DATA.map((c) => ({ label: c.eng, emoji: c.emoji })),
+    ];
+    const chosen = sample(pool, 5);
+    return [{
+      type: "matching-pairs",
+      question: "Une la palabra en inglés con su imagen",
+      pairs: chosen.map((item) => ({
+        left: { label: item.label },
+        right: { emoji: item.emoji, label: "" },
+      })),
+    }];
+  },
+
   "eng-memory": () => {
     const pairs = sample(COLORS_DATA, 4).map((c) => ({
       name: c.esp || c.name,
@@ -862,6 +1136,27 @@ const generators = {
     ];
   },
 
+  "sequence-memory": () => {
+    // "Simon says" style: show a sequence of icons lighting up, child repeats it by tapping
+    const iconSets = [
+      ["🔴", "🔵", "🟡", "🟢"],
+      ["⭐", "🌙", "☀️", "🌈"],
+      ["🐶", "🐱", "🐰", "🐻"],
+    ];
+    return Array.from({ length: 4 }, (_, round) => {
+      const icons = iconSets[Math.floor(Math.random() * iconSets.length)];
+      const length = Math.min(3 + round, icons.length + 1); // grows in difficulty: 3,4,5,5
+      const sequence = Array.from({ length }, () => icons[Math.floor(Math.random() * icons.length)]);
+      return {
+        type: "sequence-memory",
+        question: "Mira la secuencia y repítela en el mismo orden",
+        icons,
+        sequence,
+        correct: sequence,
+      };
+    });
+  },
+
   // --- PATTERNS ---
   "color-pattern": () => {
     const colors = [
@@ -887,6 +1182,139 @@ const generators = {
         correct,
       };
     });
+  },
+
+  "logic-pattern": () => {
+    // Mixed-symbol repeating pattern (shapes + numbers combined), Transición level
+    const patterns = [
+      ["⭕", "🔺", "⭕", "🔺"],
+      ["1", "2", "1", "2"],
+      ["⭐", "⭐", "🌙", "⭐", "⭐"],
+    ];
+    return Array.from({ length: 4 }, () => {
+      const pat = patterns[Math.floor(Math.random() * patterns.length)];
+      const seq = [...pat, ...pat.slice(0, 2)];
+      const blank = seq.length - 1;
+      const correct = seq[blank];
+      const wrongPool = ["⭕", "🔺", "⭐", "🌙", "1", "2", "3"].filter((x) => x !== correct);
+      return {
+        type: "pattern",
+        question: "¿Qué sigue en el patrón?",
+        sequence: [...seq.slice(0, blank), "?"],
+        options: shuffle([correct, ...sample(wrongPool, 3)]),
+        correct,
+      };
+    });
+  },
+
+  "number-pattern": () => {
+    // Numeric repeating or incrementing pattern
+    return Array.from({ length: 4 }, () => {
+      const start = Math.floor(Math.random() * 5) + 1;
+      const step = Math.random() > 0.5 ? 1 : 2;
+      const seq = [start, start + step, start + step * 2, start + step * 3];
+      const correct = start + step * 4;
+      return {
+        type: "pattern",
+        question: "¿Qué número sigue en el patrón?",
+        sequence: [...seq, "?"],
+        options: shuffle([correct, correct + 1, correct - 1, correct + step]),
+        correct,
+      };
+    });
+  },
+
+  "shape-pattern": () => {
+    const pool = ["⭕", "🔺", "🟥", "⭐", "💎"];
+    return Array.from({ length: 4 }, () => {
+      const pat = sample(pool, 2);
+      const seq = [...pat, ...pat, ...pat.slice(0, 1)];
+      const blank = seq.length - 1;
+      const correct = seq[blank];
+      return {
+        type: "pattern",
+        question: "¿Qué figura sigue en el patrón?",
+        sequence: [...seq.slice(0, blank), "?"],
+        options: shuffle([correct, ...pool.filter((x) => x !== correct).slice(0, 3)]),
+        correct,
+      };
+    });
+  },
+
+  "size-pattern": () => {
+    // Pattern of growing/shrinking sizes shown as relative emoji scale
+    const sizeSets = [
+      ["🔵", "⚪", "🔵", "⚪"],
+      ["🐜", "🐈", "🐜", "🐈"],
+    ];
+    return Array.from({ length: 3 }, () => {
+      const pat = sizeSets[Math.floor(Math.random() * sizeSets.length)];
+      const seq = [...pat, pat[0]];
+      const blank = seq.length - 1;
+      const correct = seq[blank];
+      return {
+        type: "pattern",
+        question: "¿Qué sigue en el patrón de tamaños?",
+        sequence: [...seq.slice(0, blank), "?"],
+        options: shuffle([correct, ...pat.filter((x) => x !== correct), "🟡"]),
+        correct,
+      };
+    });
+  },
+
+  "find-differences": () => {
+    // Two near-identical emoji rows; child picks which item changed
+    const scenes = [
+      { base: ["🐱", "🐱", "🐱", "🐱"], changedIdx: 2, changedTo: "🐈" },
+      { base: ["🍎", "🍎", "🍎", "🍎"], changedIdx: 1, changedTo: "🍏" },
+      { base: ["⭐", "⭐", "⭐", "⭐"], changedIdx: 3, changedTo: "🌟" },
+    ];
+    return shuffle(scenes).map((s) => {
+      const sceneA = [...s.base];
+      const sceneB = [...s.base];
+      sceneB[s.changedIdx] = s.changedTo;
+      return {
+        type: "find-differences",
+        question: "¿Qué cambió entre las dos filas?",
+        sceneA,
+        sceneB,
+        options: shuffle([
+          String(s.changedIdx + 1),
+          ...[1, 2, 3, 4].filter((n) => n !== s.changedIdx + 1).map(String),
+        ]),
+        correct: String(s.changedIdx + 1),
+      };
+    });
+  },
+
+  "size-order": () => {
+    const sets = [
+      ["🐜", "🐈", "🐕", "🐎", "🐘"],
+      ["⚪", "🟡", "🟠", "🔴"],
+      ["🌱", "🌿", "🌳"],
+    ];
+    return shuffle(sets).map((seq) => ({
+      type: "order-sequence",
+      question: "Ordena de menor a mayor tamaño",
+      items: shuffle(seq),
+      correct: seq,
+    }));
+  },
+
+  "logic-classify": () => {
+    // Classify by a logical property: living vs non-living
+    const living = ["🐕", "🐈", "🌳", "🌸", "🐦"];
+    const nonLiving = ["🚗", "🪨", "🏠", "⌚", "📚"];
+    const items = [
+      ...sample(living, 3).map((emoji) => ({ name: emoji, emoji, cat: "🌱 Con vida" })),
+      ...sample(nonLiving, 3).map((emoji) => ({ name: emoji, emoji, cat: "🪨 Sin vida" })),
+    ];
+    return [{
+      type: "classify-two",
+      question: "¿Tiene vida o no tiene vida?",
+      categories: ["🌱 Con vida", "🪨 Sin vida"],
+      items: shuffle(items),
+    }];
   },
 
   "logic-odd": () => {
@@ -1129,6 +1557,62 @@ const generators = {
       ]).map((x) => x.emoji),
       correct: item.emoji,
     }));
+  },
+
+  "object-use": () => {
+    // "What is this used for?" matching real object purposes
+    const objectUses = [
+      { obj: "Tijeras", emoji: "✂️", use: "Cortar papel" },
+      { obj: "Lápiz", emoji: "✏️", use: "Escribir o dibujar" },
+      { obj: "Paraguas", emoji: "☂️", use: "Protegerse de la lluvia" },
+      { obj: "Cepillo de dientes", emoji: "🪥", use: "Cepillarse los dientes" },
+      { obj: "Llave", emoji: "🔑", use: "Abrir una puerta" },
+      { obj: "Jabón", emoji: "🧼", use: "Lavarse las manos" },
+    ];
+    return shuffle(objectUses).map((o) => ({
+      type: "object-use",
+      question: `¿Para qué sirve esto?`,
+      emoji: o.emoji,
+      options: shuffle([
+        o.use,
+        ...objectUses.filter((x) => x.use !== o.use).map((x) => x.use).sort(() => Math.random() - 0.5).slice(0, 3),
+      ]),
+      correct: o.use,
+    }));
+  },
+
+  "opposites": () => {
+    // Pair opposite concepts using the matching-pairs (two-column) mechanic
+    const opposites = [
+      { a: "⬆️ Arriba", b: "⬇️ Abajo" },
+      { a: "🔥 Caliente", b: "🧊 Frío" },
+      { a: "☀️ Día", b: "🌙 Noche" },
+      { a: "😀 Grande", b: "🤏 Pequeño" },
+      { a: "🐢 Lento", b: "🐇 Rápido" },
+    ];
+    const chosen = sample(opposites, 4);
+    return [{
+      type: "matching-pairs",
+      question: "Une cada palabra con su opuesto",
+      pairs: chosen.map((o) => ({
+        left: { label: o.a },
+        right: { label: o.b },
+      })),
+    }];
+  },
+
+  "shadow-match": () => {
+    // Match each object to its silhouette (reusing the same emoji, darkened by the renderer)
+    const pool = [...ANIMALS_DATA.domestic, ...ANIMALS_DATA.wild, ...SHAPES_DATA];
+    const chosen = sample(pool, 4);
+    return [{
+      type: "shadow-matching",
+      question: "Une cada objeto con su sombra",
+      pairs: chosen.map((item) => ({
+        left: { emoji: item.emoji, label: item.name },
+        right: { emoji: item.emoji, label: "", isShadow: true },
+      })),
+    }];
   },
 
   // Fallback
