@@ -91,6 +91,15 @@ const generators = {
     return [{ type: "memory", pairs, gridCols: 4 }];
   },
 
+  "memory-color-adv": () => {
+    const pairs = sample(COLORS_DATA, Math.min(8, COLORS_DATA.length)).map((c) => ({
+      name: c.name,
+      emoji: c.emoji,
+      hex: c.hex,
+    }));
+    return [{ type: "memory", pairs, gridCols: 6 }];
+  },
+
   "classify-color": () => {
     const warm = COLORS_DATA.filter((c) =>
       ["Rojo", "Naranja", "Amarillo", "Rosa"].includes(c.name),
@@ -109,6 +118,50 @@ const generators = {
         ],
       },
     ];
+  },
+
+  "color-mixing": () => {
+    // Real primary-color mixing facts, simplified for Jardín level
+    const mixes = [
+      { a: { name: "Rojo", hex: "#EF4444", emoji: "🔴" }, b: { name: "Amarillo", hex: "#EAB308", emoji: "🟡" }, result: "Naranja" },
+      { a: { name: "Azul", hex: "#3B82F6", emoji: "🔵" }, b: { name: "Amarillo", hex: "#EAB308", emoji: "🟡" }, result: "Verde" },
+      { a: { name: "Rojo", hex: "#EF4444", emoji: "🔴" }, b: { name: "Azul", hex: "#3B82F6", emoji: "🔵" }, result: "Morado" },
+      { a: { name: "Blanco", hex: "#F8FAFC", emoji: "⚪" }, b: { name: "Rojo", hex: "#EF4444", emoji: "🔴" }, result: "Rosa" },
+    ];
+    return shuffle(mixes).map((m) => ({
+      type: "color-mixing",
+      question: `¿Qué color se forma al mezclar ${m.a.name} y ${m.b.name}?`,
+      colorA: m.a,
+      colorB: m.b,
+      options: shuffle([
+        m.result,
+        ...COLORS_DATA.filter((c) => c.name !== m.result).map((c) => c.name).sort(() => Math.random() - 0.5).slice(0, 3),
+      ]),
+      correct: m.result,
+    }));
+  },
+
+  "color-shades": () => {
+    // Light vs dark tone identification using the same base hue at different lightness
+    const shadePairs = [
+      { name: "Azul", light: "#93C5FD", dark: "#1E3A8A" },
+      { name: "Verde", light: "#86EFAC", dark: "#14532D" },
+      { name: "Rojo", light: "#FCA5A5", dark: "#7F1D1D" },
+      { name: "Morado", light: "#D8B4FE", dark: "#581C87" },
+      { name: "Naranja", light: "#FDBA74", dark: "#7C2D12" },
+    ];
+    return shuffle(shadePairs).map((s) => {
+      const askLight = Math.random() > 0.5;
+      return {
+        type: "color-shades",
+        question: askLight
+          ? `¿Cuál es el ${s.name} CLARO?`
+          : `¿Cuál es el ${s.name} OSCURO?`,
+        hexA: s.light,
+        hexB: s.dark,
+        correct: askLight ? "A" : "B",
+      };
+    });
   },
 
   // --- VOWELS ---
@@ -287,6 +340,78 @@ const generators = {
   }));
 },
 
+  "silhouette-animal": () => {
+    // Same recognition mechanic as recognize-animal, but visually styled as a
+    // dark silhouette by the renderer (CSS filter), which is what "¿Quién soy?" implies.
+    const allAnimals = [...ANIMALS_DATA.domestic, ...ANIMALS_DATA.wild, ...ANIMALS_DATA.birds];
+    return sample(allAnimals, 6).map((a) => ({
+      type: "silhouette-animal",
+      question: "¿Quién soy?",
+      emoji: a.emoji,
+      options: shuffle([
+        a.name,
+        ...pickWrong(allAnimals, a, 3).map((x) => x.name),
+      ]),
+      correct: a.name,
+    }));
+  },
+
+  "habitat-match": () => {
+    // Matching mechanic (not multiple choice): pair each animal with its habitat
+    const habitatLabels = {
+      casa: "🏠 Casa", granja: "🏠 Granja", selva: "🌿 Selva",
+      sabana: "🌾 Sabana", bosque: "🌲 Bosque", mar: "🌊 Mar",
+      río: "🌊 Río", lago: "🌊 Lago", árbol: "🌳 Árbol", polo: "❄️ Polo",
+    };
+    const pool = sample(
+      [...ANIMALS_DATA.domestic, ...ANIMALS_DATA.wild, ...ANIMALS_DATA.birds, ...ANIMALS_DATA.marine],
+      5
+    );
+    return [{
+      type: "matching-pairs",
+      question: "Une cada animal con su hábitat",
+      pairs: pool.map((a) => ({
+        left: { label: a.name, emoji: a.emoji },
+        right: { label: habitatLabels[a.habitat] || a.habitat }
+      }))
+    }];
+  },
+
+  "classify-animal-type": () => {
+    // Real biological classification (mammal / bird / reptile), curated by hand
+    // since ANIMALS_DATA is organized by environment, not taxonomy.
+    const mammals = [
+      ANIMALS_DATA.domestic.find(a => a.name === "Perro"),
+      ANIMALS_DATA.domestic.find(a => a.name === "Gato"),
+      ANIMALS_DATA.domestic.find(a => a.name === "Vaca"),
+      ANIMALS_DATA.wild.find(a => a.name === "León"),
+      ANIMALS_DATA.wild.find(a => a.name === "Elefante"),
+      ANIMALS_DATA.wild.find(a => a.name === "Mono"),
+    ].filter(Boolean);
+    const birds = ANIMALS_DATA.birds.filter(Boolean);
+    const reptiles = [
+      ANIMALS_DATA.marine.find(a => a.name === "Tortuga"),
+    ].filter(Boolean);
+
+    const items = [
+      ...sample(mammals, 3).map(a => ({ ...a, cat: "🐾 Mamífero" })),
+      ...sample(birds, Math.min(2, birds.length)).map(a => ({ ...a, cat: "🐦 Ave" })),
+      ...reptiles.map(a => ({ ...a, cat: "🦎 Reptil" })),
+    ];
+    return [{
+      type: "classify-three",
+      question: "Clasifica el animal: ¿mamífero, ave o reptil?",
+      categories: ["🐾 Mamífero", "🐦 Ave", "🦎 Reptil"],
+      items: shuffle(items),
+    }];
+  },
+
+  "memory-animal-adv": () => {
+    const pool = [...ANIMALS_DATA.domestic, ...ANIMALS_DATA.wild, ...ANIMALS_DATA.birds];
+    const pairs = sample(pool, Math.min(6, pool.length)).map(a => ({ name: a.name, emoji: a.emoji }));
+    return [{ type: "memory", pairs, gridCols: 4 }];
+  },
+
   // --- SOUNDS (environmental, non-animal) ---
   "identify-sound": () => {
     return sample(SOUNDS_DATA, 6).map((s) => ({
@@ -354,6 +479,32 @@ const generators = {
     });
   },
 
+  "relate-number": () => {
+    // Shows a quantity of objects; child relates it to the matching numeral
+    const emojis = ["🍎", "⭐", "🐾", "🎈", "🌸"];
+    return Array.from({ length: 6 }, () => {
+      const count = Math.floor(Math.random() * 12) + 1;
+      const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+      return {
+        type: "relate-number",
+        question: "¿Qué número representa esta cantidad?",
+        emoji,
+        count,
+        options: shuffle(
+          [
+            count,
+            ...new Set(
+              [count - 2, count - 1, count + 1, count + 2].filter(
+                (n) => n > 0 && n <= 20,
+              ),
+            ),
+          ].slice(0, 4),
+        ),
+        correct: count,
+      };
+    });
+  },
+
   "order-numbers": () => {
     const start = Math.floor(Math.random() * 10) + 1;
     const nums = Array.from({ length: 5 }, (_, i) => start + i);
@@ -365,6 +516,53 @@ const generators = {
         correct: nums,
       },
     ];
+  },
+
+  "pattern-sequence": () => {
+    // Drag-to-order version of a repeating pattern (distinct from color-pattern's multiple choice)
+    const patterns = [
+      ["🔴", "🔵", "🔴", "🔵", "🔴"],
+      ["🟡", "🟢", "🟢", "🟡", "🟢"],
+      ["⭐", "🌙", "⭐", "🌙", "⭐"],
+      ["🔺", "🔺", "⭕", "🔺", "🔺"],
+    ];
+    return shuffle(patterns).map((seq) => ({
+      type: "order-sequence",
+      question: "Ordena la secuencia como va el patrón",
+      items: shuffle(seq),
+      correct: seq,
+    }));
+  },
+
+  "size-sequence": () => {
+    // Order by size: small to large
+    const sets = [
+      ["🐜", "🐈", "🐕", "🐎", "🐘"],
+      ["🌱", "🌿", "🌳"],
+      ["⚪", "🟡", "🟠", "🔴"],
+    ];
+    return shuffle(sets).map((seq) => ({
+      type: "order-sequence",
+      question: "Ordena de más pequeño a más grande",
+      items: shuffle(seq),
+      correct: seq,
+    }));
+  },
+
+  "story-sequence": () => {
+    // Order simple daily-routine steps logically (age-appropriate for Jardín)
+    const stories = [
+      { steps: ["😴 Dormir", "⏰ Despertar", "🪥 Cepillarse", "🍳 Desayunar", "🎒 Ir al colegio"] },
+      { steps: ["🌱 Semilla", "🌿 Brote", "🌳 Árbol"] },
+      { steps: ["🥚 Huevo", "🐛 Oruga", "🦋 Mariposa"] },
+      { steps: ["🛁 Bañarse", "👕 Vestirse", "🍽️ Comer", "😴 Dormir"] },
+    ];
+    return shuffle(stories).map((s) => ({
+      type: "order-sequence",
+      question: "Ordena la historia en el orden correcto",
+      items: shuffle(s.steps),
+      correct: s.steps,
+    }));
   },
 
   "number-sequence": () => {
@@ -416,6 +614,52 @@ const generators = {
         items: shuffle(items),
       },
     ];
+  },
+
+  "count-sides": () => {
+    // Only shapes with a clear, countable number of sides (excludes circle/heart which are 0/curved)
+    const countable = SHAPES_DATA.filter((s) => s.sides > 0);
+    return sample(countable, 5).map((s) => ({
+      type: "count-sides",
+      question: `¿Cuántos lados tiene esta figura?`,
+      emoji: s.emoji,
+      options: shuffle([
+        s.sides,
+        ...new Set(
+          [s.sides - 1, s.sides + 1, s.sides + 2].filter((n) => n > 0),
+        ),
+      ].slice(0, 4)),
+      correct: s.sides,
+    }));
+  },
+
+  "shape-object": () => {
+    // Real-world objects that visually correspond to a geometric shape
+    const objectShapeMap = [
+      { obj: "Pizza", emoji: "🍕", shape: "Círculo" },
+      { obj: "Reloj", emoji: "🕐", shape: "Círculo" },
+      { obj: "Sandía (corte)", emoji: "🍉", shape: "Círculo" },
+      { obj: "Caja de regalo", emoji: "🎁", shape: "Cuadrado" },
+      { obj: "Ventana", emoji: "🪟", shape: "Cuadrado" },
+      { obj: "Sandwich", emoji: "🥪", shape: "Triángulo" },
+      { obj: "Porción de pizza", emoji: "🍕", shape: "Triángulo" },
+      { obj: "Señal de tránsito", emoji: "⚠️", shape: "Triángulo" },
+      { obj: "Puerta", emoji: "🚪", shape: "Rectángulo" },
+      { obj: "Libro", emoji: "📖", shape: "Rectángulo" },
+      { obj: "Señal de stop", emoji: "🛑", shape: "Hexágono" },
+    ];
+    return shuffle(objectShapeMap).slice(0, 5).map((o) => ({
+      type: "shape-object",
+      question: `¿Qué figura tiene este objeto?`,
+      emoji: o.emoji,
+      options: shuffle([
+        o.shape,
+        ...new Set(
+          SHAPES_DATA.filter((s) => s.name !== o.shape).map((s) => s.name),
+        ),
+      ].slice(0, 4)),
+      correct: o.shape,
+    }));
   },
 
   // --- MATH: SUMS ---
@@ -502,6 +746,26 @@ const generators = {
         ...pickWrong(COLORS_DATA, c, 3).map((x) => x.eng),
       ]),
       correct: c.eng,
+    }));
+  },
+
+  "eng-numbers": () => {
+    // Numbers 1-10 in English, appropriate for Jardín level (basic counting)
+    const numbersEng = [
+      { n: 1, eng: "One" }, { n: 2, eng: "Two" }, { n: 3, eng: "Three" },
+      { n: 4, eng: "Four" }, { n: 5, eng: "Five" }, { n: 6, eng: "Six" },
+      { n: 7, eng: "Seven" }, { n: 8, eng: "Eight" }, { n: 9, eng: "Nine" },
+      { n: 10, eng: "Ten" },
+    ];
+    return sample(numbersEng, 6).map((item) => ({
+      type: "eng-numbers",
+      question: `¿Cómo se dice el número "${item.n}" en inglés?`,
+      emoji: String(item.n),
+      options: shuffle([
+        item.eng,
+        ...numbersEng.filter((x) => x.n !== item.n).map((x) => x.eng).sort(() => Math.random() - 0.5).slice(0, 3),
+      ]),
+      correct: item.eng,
     }));
   },
 
@@ -642,6 +906,47 @@ const generators = {
         correct: g.odd,
         reason: g.reason,
       }));
+  },
+
+  // Alias: curriculum.js uses "odd-one-out" as the type name for this same mechanic
+  "odd-one-out": () => generators["logic-odd"](),
+
+  "group-classify": () => {
+    // General-purpose "which group does this belong to" using everyday categories
+    const groups = [
+      { items: ["🍎", "🍌", "🍊"], cat: "🍎 Frutas" },
+      { items: ["🐕", "🐈", "🐄"], cat: "🐾 Animales" },
+      { items: ["🚗", "🚌", "✈️"], cat: "🚗 Transportes" },
+      { items: ["🔴", "🔵", "🟢"], cat: "🎨 Colores" },
+      { items: ["⭕", "🔺", "🟥"], cat: "🔷 Figuras" },
+    ];
+    const items = groups.flatMap((g) =>
+      sample(g.items, Math.min(2, g.items.length)).map((emoji) => ({ name: emoji, emoji, cat: g.cat }))
+    );
+    return [{
+      type: "classify-two",
+      question: "¿A cuál grupo pertenece?",
+      categories: groups.map((g) => g.cat),
+      items: shuffle(items),
+    }];
+  },
+
+  "group-alike": () => {
+    // "Find the ones that are alike": pick all items sharing the same category among a mixed set
+    const categories = [
+      { label: "🍎 Frutas", items: ["🍎", "🍌", "🍊", "🍇"] },
+      { label: "🐾 Animales", items: ["🐕", "🐈", "🐄", "🐷"] },
+    ];
+    const target = categories[Math.floor(Math.random() * categories.length)];
+    const other = categories.find((c) => c.label !== target.label);
+    const correctItems = sample(target.items, 3);
+    const distractor = sample(other.items, 1);
+    return [{
+      type: "select-alike",
+      question: `Selecciona los que son ${target.label}`,
+      items: shuffle([...correctItems, ...distractor]),
+      correctItems,
+    }];
   },
 
   // --- BODY PARTS ---

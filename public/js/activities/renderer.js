@@ -14,11 +14,18 @@ export const ActivityRenderer = {
       case 'identify-color':
       case 'select-color':
         return this._renderColorQuestion(question, container);
+      case 'color-mixing':
+        return this._renderColorMixing(question, container);
+      case 'color-shades':
+        return this._renderColorShades(question, container);
       case 'object-color':
         return this._renderObjectColor(question, container);
       case 'recognize-vocal':
       case 'recognize-animal':
       case 'recognize-shape':
+        return this._renderMultipleChoice(question, container);
+      case 'silhouette-animal':
+        return this._renderSilhouetteAnimal(question, container);
       case 'identify-body':
       case 'identify-fruit':
       case 'fruit-color':
@@ -26,6 +33,8 @@ export const ActivityRenderer = {
       case 'sound-animal':
       case 'animal-sound-match':
       case 'identify-sound':
+      case 'count-sides':
+      case 'shape-object':
         return this._renderMultipleChoice(question, container);
         case 'habitat':
   return this._renderMultipleChoice(question, container);
@@ -41,18 +50,22 @@ export const ActivityRenderer = {
       case 'word-image':
         return this._renderImageVocal(question, container);
       case 'count-objects':
+      case 'relate-number':
         return this._renderCountObjects(question, container);
       case 'select-number':
       case 'number-sequence':
         return this._renderMultipleChoice(question, container);
       case 'order-numbers':
         return this._renderOrderNumbers(question, container);
+      case 'order-sequence':
+        return this._renderOrderSequence(question, container);
       case 'sum-objects':
         return this._renderSumObjects(question, container);
       case 'sum-numbers':
       case 'sub-numbers':
         return this._renderMathQuestion(question, container);
       case 'eng-colors':
+      case 'eng-numbers':
       case 'eng-animals':
       case 'eng-greetings':
       case 'eng-body':
@@ -61,9 +74,14 @@ export const ActivityRenderer = {
       case 'memory-bilingual':
         return this._renderMemoryGame(question, container);
       case 'classify-two':
+      case 'classify-three':
         return this._renderClassifyTwo(question, container);
+      case 'matching-pairs':
+        return this._renderMatchingPairs(question, container);
       case 'odd-one-out':
         return this._renderOddOneOut(question, container);
+      case 'select-alike':
+        return this._renderSelectAlike(question, container);
       case 'pattern':
         return this._renderPattern(question, container);
       case 'classify-transport':
@@ -97,6 +115,44 @@ export const ActivityRenderer = {
     this._attachOptionListeners(container, '.color-option-btn', q.correct);
   },
 
+  // ===== COLOR MIXING (A + B = ?) =====
+  _renderColorMixing(q, container) {
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="math-display" style="gap:1.5rem;flex-wrap:wrap">
+          <div class="color-target" style="background:${q.colorA.hex};width:90px;height:90px"></div>
+          <div class="math-op">+</div>
+          <div class="color-target" style="background:${q.colorB.hex};width:90px;height:90px"></div>
+          <div class="math-op">=</div>
+          <div class="color-target" style="background:repeating-linear-gradient(45deg,#999,#999 10px,#bbb 10px,#bbb 20px);width:90px;height:90px;display:flex;align-items:center;justify-content:center;font-size:2rem">?</div>
+        </div>
+        <div class="options-grid cols-2" style="margin-top:1.5rem">
+          ${q.options.map(opt => `
+            <button class="option-btn" data-answer="${opt}">
+              <span class="opt-label">${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', q.correct);
+  },
+
+  // ===== COLOR SHADES (pick light or dark version) =====
+  _renderColorShades(q, container) {
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="color-options-row" style="margin-top:1.5rem">
+          <button class="option-btn" data-answer="A" style="width:140px;height:140px;border-radius:50%;background:${q.hexA}"></button>
+          <button class="option-btn" data-answer="B" style="width:140px;height:140px;border-radius:50%;background:${q.hexB}"></button>
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', q.correct);
+  },
+
   // ===== OBJECT COLOR =====
   _renderObjectColor(q, container) {
     container.innerHTML = `
@@ -107,6 +163,24 @@ export const ActivityRenderer = {
           ${q.options.map(opt => `
             <button class="option-btn" data-answer="${opt}">
               <span class="opt-emoji">${COLORS_DATA_MAP[opt] || '🎨'}</span>
+              <span class="opt-label">${opt}</span>
+            </button>
+          `).join('')}
+        </div>
+      </div>
+    `;
+    this._attachOptionListeners(container, '.option-btn', q.correct);
+  },
+
+  // ===== SILHOUETTE ANIMAL ("¿Quién soy?") =====
+  _renderSilhouetteAnimal(q, container) {
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div style="font-size:clamp(5rem,12vw,8rem);margin:0.5rem 0;filter:brightness(0) opacity(0.85);transform:scaleX(1)">${q.emoji}</div>
+        <div class="options-grid cols-2" style="margin-top:1rem">
+          ${q.options.map(opt => `
+            <button class="option-btn" data-answer="${opt}">
               <span class="opt-label">${opt}</span>
             </button>
           `).join('')}
@@ -279,6 +353,45 @@ export const ActivityRenderer = {
       </div>
     `;
     this._attachOptionListeners(container, '.option-btn', String(q.correct));
+  },
+
+  // ===== ORDER SEQUENCE (generic: works with emoji/text, not just numbers) =====
+  _renderOrderSequence(q, container) {
+    let current = [];
+    const update = () => {
+      container.querySelector('.order-slots').innerHTML = current.map((val) =>
+        `<div class="order-slot filled"><div class="order-item">${val}</div></div>`
+      ).join('') + Array(q.correct.length - current.length).fill(
+        '<div class="order-slot"></div>'
+      ).join('');
+    };
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="order-items">
+          ${q.items.map((val, i) => `<div class="order-item" data-idx="${i}" data-val="${val}">${val}</div>`).join('')}
+        </div>
+        <div class="question-subtitle" style="margin:1rem 0;font-size:1rem;opacity:0.7">↓ Colócalos en el orden correcto ↓</div>
+        <div class="order-slots">
+          ${q.correct.map(() => '<div class="order-slot"></div>').join('')}
+        </div>
+        <button class="class-btn primary" id="check-order" style="margin-top:1rem">✓ Verificar</button>
+      </div>
+    `;
+    container.querySelectorAll('.order-item').forEach(item => {
+      item.addEventListener('click', () => {
+        if (item.style.pointerEvents === 'none') return;
+        current.push(item.dataset.val);
+        item.style.opacity = '0.3';
+        item.style.pointerEvents = 'none';
+        update();
+      });
+    });
+    container.querySelector('#check-order')?.addEventListener('click', () => {
+      const isCorrect = JSON.stringify(current) === JSON.stringify(q.correct.map(String));
+      SoundEngine.play(isCorrect ? 'correct' : 'wrong');
+      setTimeout(() => this.onAnswer?.(isCorrect), 500);
+    });
   },
 
   // ===== ORDER NUMBERS =====
@@ -480,6 +593,65 @@ export const ActivityRenderer = {
     });
   },
 
+  // ===== MATCHING PAIRS (two columns, click left then right) =====
+  _renderMatchingPairs(q, container) {
+    let selectedLeft = null;
+    let matchedCount = 0;
+    const shuffledRight = this._shuffleArr([...q.pairs]);
+
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="matching-container">
+          <div class="matching-col" id="match-left">
+            ${q.pairs.map((p, i) => `
+              <div class="match-item" data-idx="${i}" data-side="left">${p.left.emoji ? p.left.emoji + ' ' : ''}${p.left.label}</div>
+            `).join('')}
+          </div>
+          <div class="matching-col" id="match-right">
+            ${shuffledRight.map((p) => `
+              <div class="match-item" data-idx="${q.pairs.indexOf(p)}" data-side="right">${p.right.emoji ? p.right.emoji + ' ' : ''}${p.right.label}</div>
+            `).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+
+    const leftItems = container.querySelectorAll('[data-side="left"]');
+    const rightItems = container.querySelectorAll('[data-side="right"]');
+
+    leftItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (item.classList.contains('matched')) return;
+        leftItems.forEach(i => i.classList.remove('selected'));
+        item.classList.add('selected');
+        selectedLeft = item;
+      });
+    });
+
+    rightItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (!selectedLeft || item.classList.contains('matched')) return;
+        const isCorrect = selectedLeft.dataset.idx === item.dataset.idx;
+        if (isCorrect) {
+          selectedLeft.classList.add('matched');
+          selectedLeft.classList.remove('selected');
+          item.classList.add('matched');
+          SoundEngine.play('correct');
+          matchedCount++;
+          selectedLeft = null;
+          if (matchedCount === q.pairs.length) {
+            setTimeout(() => this.onAnswer?.(true), 500);
+          }
+        } else {
+          item.classList.add('wrong-match');
+          SoundEngine.play('wrong');
+          setTimeout(() => item.classList.remove('wrong-match'), 500);
+        }
+      });
+    });
+  },
+
   // ===== CLASSIFY TWO CATEGORIES =====
   _renderClassifyTwo(q, container) {
     let placed = {};
@@ -559,6 +731,50 @@ export const ActivityRenderer = {
           setTimeout(() => zone.classList.remove('wrong-match'), 500);
         }
       });
+    });
+  },
+
+  // ===== SELECT ALIKE (multi-select: pick all matching items) =====
+  _renderSelectAlike(q, container) {
+    const selected = new Set();
+    container.innerHTML = `
+      <div class="question-container">
+        <div class="question-title">${q.question}</div>
+        <div class="question-subtitle" style="margin-bottom:0.5rem;opacity:0.8">Toca todos los correctos y luego confirma 👇</div>
+        <div class="options-grid cols-2" style="max-width:500px">
+          ${q.items.map((item, i) => `
+            <button class="option-btn" data-idx="${i}" data-answer="${item}">
+              <span class="opt-emoji">${item}</span>
+            </button>
+          `).join('')}
+        </div>
+        <button class="class-btn primary" id="confirm-alike" style="margin-top:1.25rem">✓ Confirmar</button>
+      </div>
+    `;
+    const buttons = container.querySelectorAll('.option-btn');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        const idx = btn.dataset.idx;
+        if (selected.has(idx)) {
+          selected.delete(idx);
+          btn.classList.remove('selected');
+        } else {
+          selected.add(idx);
+          btn.classList.add('selected');
+        }
+      });
+    });
+    container.querySelector('#confirm-alike')?.addEventListener('click', () => {
+      const chosenValues = Array.from(selected).map(idx => buttons[idx].dataset.answer);
+      const isCorrect = chosenValues.length === q.correctItems.length &&
+        chosenValues.every(v => q.correctItems.includes(v));
+      buttons.forEach(btn => {
+        btn.classList.add('disabled');
+        if (q.correctItems.includes(btn.dataset.answer)) btn.classList.add('correct');
+        else if (selected.has(btn.dataset.idx)) btn.classList.add('wrong');
+      });
+      SoundEngine.play(isCorrect ? 'correct' : 'wrong');
+      setTimeout(() => this.onAnswer?.(isCorrect), 900);
     });
   },
 
